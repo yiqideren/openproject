@@ -1,19 +1,16 @@
-import {WorkPackageTimelineTableController} from "./wp-table/timeline/wp-timeline-container.directive";
-import {WorkPackageTable} from "./wp-fast-table/wp-fast-table";
-import {WPTableHierarchyState, WPTableRowSelectionState} from "./wp-fast-table/wp-table.interfaces";
-import {MultiState, State} from "../helpers/reactive-fassade";
-import {WorkPackageResource} from "./api/api-v3/hal-resources/work-package-resource.service";
+import {Subject} from "rxjs";
 import {opServicesModule} from "../angular-modules";
+import {whenDebugging} from "../helpers/debug_output";
+import {MultiState, State, initStates} from "../helpers/reactive-fassade";
 import {SchemaResource} from "./api/api-v3/hal-resources/schema-resource.service";
 import {TypeResource} from "./api/api-v3/hal-resources/type-resource.service";
+import {WorkPackageResource} from "./api/api-v3/hal-resources/work-package-resource.service";
 import {WorkPackageEditForm} from "./wp-edit-form/work-package-edit-form";
+import {WorkPackageTable} from "./wp-fast-table/wp-fast-table";
 import {WorkPackageTableMetadata} from "./wp-fast-table/wp-table-metadata";
-import {Subject} from "rxjs";
-import {Component} from "reactivecomponents";
-import {createNewContext} from "../../node_modules/reactivecomponents/dist/Context";
-import {whenDebugging} from "../helpers/debug_output";
+import {WPTableHierarchyState, WPTableRowSelectionState} from "./wp-fast-table/wp-table.interfaces";
 
-export class States extends Component {
+export class States {
 
   /* /api/v3/work_packages */
   workPackages = new MultiState<WorkPackageResource>();
@@ -59,16 +56,24 @@ export class States extends Component {
   // Open editing forms
   editing = new MultiState<WorkPackageEditForm>();
 
+  constructor() {
+    initStates(this, function (msg: any) {
+      whenDebugging(() => {
+        console.debug(msg);
+      });
+    });
+  }
+
 }
 
+opServicesModule.service('states', States);
 
-const ctx = createNewContext();
-const states = ctx.create(States);
-
-whenDebugging(() => {
-  states.loggingFn = (msg: string) => {
-    console.debug(msg);
-  }
-});
-
-opServicesModule.value('states', states);
+// const ctx = createNewContext();
+// const states = ctx.create(States);
+// whenDebugging(() => {
+  // states.enableLog(true);
+  // states.loggingFn = (msg: string) => {
+  //   console.debug(msg);
+  // }
+// });
+// opServicesModule.value('states', states);
