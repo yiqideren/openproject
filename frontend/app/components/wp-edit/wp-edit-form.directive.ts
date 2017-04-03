@@ -27,30 +27,30 @@
 // ++
 
 import {ErrorResource} from "../api/api-v3/hal-resources/error-resource.service";
-import {WorkPackageEditModeStateService} from "./wp-edit-mode-state.service";
-import {WorkPackageEditFieldController} from "./wp-edit-field/wp-edit-field.directive";
-import {WorkPackageCacheService} from "../work-packages/work-package-cache.service";
-import {WorkPackageResourceInterface} from '../api/api-v3/hal-resources/work-package-resource.service';
+import {WorkPackageResourceInterface} from "../api/api-v3/hal-resources/work-package-resource.service";
 import {States} from "../states.service";
-import {WorkPackageNotificationService} from './wp-notification.service';
+import {WorkPackageCacheService} from "../work-packages/work-package-cache.service";
+import {WorkPackageEditFieldController} from "./wp-edit-field/wp-edit-field.directive";
+import {WorkPackageEditModeStateService} from "./wp-edit-mode-state.service";
+import {WorkPackageNotificationService} from "./wp-notification.service";
 
 export class WorkPackageEditFormController {
-  public workPackage:WorkPackageResourceInterface;
+  public workPackage: WorkPackageResourceInterface;
   public hasEditMode: boolean;
   public errorHandler: Function;
   public successHandler: Function;
-  public fields:{[attribute:string]: WorkPackageEditFieldController} = {};
+  public fields: { [attribute: string]: WorkPackageEditFieldController } = {};
 
-  private errorsPerAttribute:{[attribute:string]: any} = {};
+  private errorsPerAttribute: { [attribute: string]: any } = {};
   public firstActiveField: string;
 
   constructor(protected states: States,
               protected $scope: ng.IScope,
-              protected $q:ng.IQService,
-              protected $rootScope:ng.IRootScopeService,
-              protected wpNotificationsService:WorkPackageNotificationService,
-              protected QueryService:any,
-              protected loadingIndicator:any,
+              protected $q: ng.IQService,
+              protected $rootScope: ng.IRootScopeService,
+              protected wpNotificationsService: WorkPackageNotificationService,
+              protected QueryService: any,
+              protected loadingIndicator: any,
               protected wpEditModeState: WorkPackageEditModeStateService,
               protected wpCacheService: WorkPackageCacheService) {
 
@@ -64,14 +64,14 @@ export class WorkPackageEditFormController {
       });
   }
 
-  public registerField(field:WorkPackageEditFieldController) {
+  public registerField(field: WorkPackageEditFieldController) {
     this.fields[field.fieldName] = field;
     field.setErrors(this.errorsPerAttribute[field.fieldName] || []);
   }
 
   public toggleEditMode(state: boolean) {
     this.$scope.$evalAsync(() => {
-      angular.forEach(this.fields, (field:WorkPackageEditFieldController) => {
+      angular.forEach(this.fields, (field: WorkPackageEditFieldController) => {
 
         // Setup the field if it is not yet active
         if (state && field.isEditable && !field.active) {
@@ -123,7 +123,7 @@ export class WorkPackageEditFormController {
     return this.updateWorkPackage();
   }
 
-  public updateWorkPackage():ng.IPromise<WorkPackageResourceInterface> {
+  public updateWorkPackage(): ng.IPromise<WorkPackageResourceInterface> {
     if (!(this.workPackage.dirty || this.workPackage.isNew)) {
       return this.$q.when(this.workPackage);
     }
@@ -137,7 +137,7 @@ export class WorkPackageEditFormController {
 
     this.workPackage.save()
       .then(() => {
-        angular.forEach(this.fields, (field:WorkPackageEditFieldController) => {
+        angular.forEach(this.fields, (field: WorkPackageEditFieldController) => {
           field.setErrors([]);
           field.deactivate();
         });
@@ -179,7 +179,7 @@ export class WorkPackageEditFormController {
     });
 
     this.$scope.$evalAsync(() => {
-      angular.forEach(this.fields, (field:WorkPackageEditFieldController) => {
+      angular.forEach(this.fields, (field: WorkPackageEditFieldController) => {
         field.setErrors(this.errorsPerAttribute[field.fieldName] || []);
       });
 

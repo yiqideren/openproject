@@ -1,7 +1,8 @@
+import {Component, createNewContext, inputStateCache, input, stateCache} from "reactivestates";
 import {Subject} from "rxjs";
 import {opServicesModule} from "../angular-modules";
 import {whenDebugging} from "../helpers/debug_output";
-import {MultiState, State, initStates} from "../helpers/reactive-fassade";
+import {MultiState, State} from "../helpers/reactive-fassade";
 import {SchemaResource} from "./api/api-v3/hal-resources/schema-resource.service";
 import {TypeResource} from "./api/api-v3/hal-resources/type-resource.service";
 import {WorkPackageResource} from "./api/api-v3/hal-resources/work-package-resource.service";
@@ -10,10 +11,11 @@ import {WorkPackageTable} from "./wp-fast-table/wp-fast-table";
 import {WorkPackageTableMetadata} from "./wp-fast-table/wp-table-metadata";
 import {WPTableHierarchyState, WPTableRowSelectionState} from "./wp-fast-table/wp-table.interfaces";
 
-export class States {
+export class States extends Component {
 
   /* /api/v3/work_packages */
-  workPackages = new MultiState<WorkPackageResource>();
+  workPackages = inputStateCache<WorkPackageResource>();// new MultiState<WorkPackageResource>();
+  // workPackages = stateCache(() => input<WorkPackageResource>());// new MultiState<WorkPackageResource>();
 
   /* /api/v3/schemas */
   schemas = new MultiState<SchemaResource>();
@@ -33,7 +35,7 @@ export class States {
     // Table row selection state
     selection: new State<WPTableRowSelectionState>(),
     // Current state of collapsed groups (if any)
-    collapsedGroups: new State<{[identifier: string]: boolean}>(),
+    collapsedGroups: new State<{ [identifier: string]: boolean }>(),
     // Hierarchies of table
     hierarchies: new State<WPTableHierarchyState>(),
     // State to be updated when the table is up to date
@@ -41,7 +43,7 @@ export class States {
     // State to determine timeline visibility
     timelineVisible: new State<boolean>(),
     // Subject used to unregister all listeners of states above.
-    stopAllSubscriptions: new Subject()
+    stopAllSubscriptions: new Subject<object>()
   };
 
   // Query states
@@ -56,24 +58,21 @@ export class States {
   // Open editing forms
   editing = new MultiState<WorkPackageEditForm>();
 
-  constructor() {
-    initStates(this, function (msg: any) {
-      whenDebugging(() => {
-        console.debug(msg);
-      });
-    });
-  }
+  // constructor() {
+  //   initStates(this, function (msg: any) {
+  //     whenDebugging(() => {
+  //       console.debug(msg);
+  //     });
+  //   });
+  // }
 
 }
 
-opServicesModule.service('states', States);
+// opServicesModule.service('states', States);
 
-// const ctx = createNewContext();
-// const states = ctx.create(States);
-// whenDebugging(() => {
-  // states.enableLog(true);
-  // states.loggingFn = (msg: string) => {
-  //   console.debug(msg);
-  // }
-// });
-// opServicesModule.value('states', states);
+const ctx = createNewContext();
+const states = ctx.create(States);
+whenDebugging(() => {
+  states.enableLog(true);
+});
+opServicesModule.value('states', states);
