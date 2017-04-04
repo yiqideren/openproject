@@ -32,22 +32,12 @@ module API
     module Queries
       module SortBys
         class SortByDecorator
-          def initialize(column_name, direction)
+          def initialize(column, direction)
             if !['asc', 'desc'].include?(direction)
               raise ArgumentError, "Invalid direction. Only 'asc' and 'desc' are supported."
             end
 
             self.direction = direction
-
-            column_sym = column_name.to_sym
-            column = Query
-                     .sortable_columns
-                     .detect { |candidate| candidate.name == column_sym }
-
-            if column.nil?
-              raise ArgumentError, "Invalid column name."
-            end
-
             self.column = column
           end
 

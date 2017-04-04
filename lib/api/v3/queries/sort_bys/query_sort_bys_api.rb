@@ -49,10 +49,14 @@ module API
 
             namespace ':id-:direction' do
               get do
-                ar_id = convert_to_ar(params[:id])
+                ar_id = convert_to_ar(params[:id]).to_sym
 
                 begin
-                  decorator = ::API::V3::Queries::SortBys::SortByDecorator.new(ar_id,
+                  column = Query
+                           .sortable_columns
+                           .detect { |candidate| candidate.name == ar_id }
+
+                  decorator = ::API::V3::Queries::SortBys::SortByDecorator.new(column,
                                                                                params[:direction])
                   ::API::V3::Queries::SortBys::QuerySortByRepresenter.new(decorator)
                 rescue ArgumentError
